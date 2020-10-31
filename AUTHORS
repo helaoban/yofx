@@ -1,2 +1,7 @@
-Thanks:
-The authors of ofxtools, ofxparse and ofxclient.
+This project originally started as a fork of ofxclient, but ended up becoming a merge/re-write of several existing ofx projects (simplified and stripped of much, much functionality).
+
+
+Thanks to the authors of the following projects:
+    - ofxclient: https://github.com/captin411/ofxclient
+    - ofxtools: https://github.com/csingley/ofxtools
+    - ofxparse: https://github.com/jseutter/ofxparse
