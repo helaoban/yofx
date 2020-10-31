@@ -31,8 +31,8 @@ def parse_test_args(subparsers) -> None:
 
 
 def parse_acctinfo_args(subparsers) -> None:
-    acctinfo = subparsers.add_parser('acctinfo', help='List accounts')
-    acctinfo.set_defaults(func=account_info)
+    accounts = subparsers.add_parser('accounts', help='List accounts')
+    accounts.set_defaults(func=list_accounts)
 
 
 def parse_tx_args(subparsers) -> None:
@@ -78,7 +78,7 @@ def parse_tx_args(subparsers) -> None:
         default="json",
         help="Set verbosity level",
     )
-    tx_cmd.set_defaults(func=tx)
+    tx_cmd.set_defaults(func=list_transactions)
 
 
 def parse_args() -> t.Dict[str, t.Any]:
@@ -107,14 +107,14 @@ def test_parse(args: dict) -> None:
     print(json.dumps(result))
 
 
-def account_info(args: dict) -> None:
+def list_accounts(args: dict) -> None:
     config = default_config()
     client = Client(config)
     result = client.query_accounts()
     print(json.dumps(result["accounts"]))
 
 
-def tx(args: dict) -> None:
+def list_transactions(args: dict) -> None:
     config = default_config()
     client = Client(config)
     now = dt.datetime.utcnow()
