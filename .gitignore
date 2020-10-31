@@ -1,0 +1,15 @@
+__pycache__/
+*.py[co]
+eggs
+*.egg
+*.egg-info
+.eggs
+.buildinfo
+.doctrees
+dist
+build
+bin
+sdist
+develop-eggs
+.venv
+.envrc
