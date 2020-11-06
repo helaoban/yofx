@@ -72,6 +72,16 @@ def parse_tx_args(subparsers) -> None:
         ),
     )
     tx_cmd.add_argument(
+        "-s", "--start",
+        type=lambda s: dt.datetime.strptime(s, "%Y-%m-%d"),
+        help="Start date",
+    )
+    tx_cmd.add_argument(
+        "-e", "--end",
+        type=lambda s: dt.datetime.strptime(s, "%Y-%m-%d"),
+        help="End date",
+    )
+    tx_cmd.add_argument(
         "-o", "--output-format",
         type=str,
         choices=("csv", "json"),
@@ -117,12 +127,20 @@ def list_accounts(args: dict) -> None:
 def list_transactions(args: dict) -> None:
     config = default_config()
     client = Client(config)
-    now = dt.datetime.utcnow()
-    start_date = now - dt.timedelta(days=args["days"])
+
+    end_date = args["end"]
+    if end_date is None:
+        end_date = dt.datetime.utcnow()
+
+    start_date = args["start"]
+    if start_date is None:
+        start_date = end_date - dt.timedelta(days=args["days"])
+
     transactions = client.query_transactions(
         account_id=args["account"],
         routing_number=args["routing_number"],
         start_date=start_date,
+        end_date=end_date,
         account_type=args["account_type"],
     )
 

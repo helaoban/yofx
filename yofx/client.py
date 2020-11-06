@@ -46,6 +46,7 @@ STATEMENT_REQUEST = """
     </BANKACCTFROM>
     <INCTRAN>
         <DTSTART>{start_date}</DTSTART>
+        <DTEND>{end_date}</DTEND>
         <INCLUDE>Y</INCLUDE>
     </INCTRAN>
 </STMTRQ>
@@ -59,6 +60,7 @@ CC_STATEMENT_REQUEST = """
     </CCACCTFROM>
     <INCTRAN>
         <DTSTART>{start_date}</DTSTART>
+        <DTEND>{end_date}</DTEND>
         <INCLUDE>Y</INCLUDE>
     </INCTRAN>
 </CCSTMTRQ>
@@ -110,6 +112,7 @@ def _format_headers(headers: t.Dict[str, str]) -> str:
 def _statement_request(
     account_id: str,
     start_date: dt.datetime,
+    end_date: dt.datetime,
     account_type: str,
     bank_id: str,
 ) -> str:
@@ -118,6 +121,7 @@ def _statement_request(
         account_id=account_id,
         account_type=account_type,
         start_date=to_ofx_date(start_date),
+        end_date=to_ofx_date(end_date),
     )
     return MESSAGE.format(
         msg_type="BANK",
@@ -130,11 +134,13 @@ def _statement_request(
 def _cc_statement_request(
     account_id: str,
     start_date: dt.datetime,
+    end_date: dt.datetime,
 ) -> str:
 
     req = CC_STATEMENT_REQUEST.format(
         account_id=account_id,
         start_date=to_ofx_date(start_date),
+        end_date=to_ofx_date(end_date),
     )
 
     return MESSAGE.format(
@@ -265,20 +271,43 @@ class Client:
         account_id: str,
         routing_number: str,
         start_date: t.Optional[dt.datetime] = None,
+        end_date: t.Optional[dt.datetime] = None,
         account_type: str = "CHECKING",
     ) -> t.List[tp.Transaction]:
+        if end_date is None:
+            end_date = dt.datetime.utcnow()
         if start_date is None:
-            start_date = dt.datetime(1970, 12, 31)
+            start_date = end_date - dt.timedelta(days=30)
+        else:
+            if start_date > end_date:
+                raise ValueError(
+                    f"Start date {start_date} is greater "
+                    f"than end date '{end_date}'")
         account_req = _statement_request(
-            account_id, start_date, account_type, routing_number)
+            account_id,
+            start_date,
+            end_date,
+            account_type,
+            routing_number
+        )
         result = self.query(account_req)
         return result["transactions"]
 
     def query_cc_transactions(
         self,
         account_id: str,
-        date: dt.datetime,
+        start_date: t.Optional[dt.datetime] = None,
+        end_date: t.Optional[dt.datetime] = None,
     ) -> t.List[tp.Transaction]:
-        query = _cc_statement_request(account_id, date)
+        if end_date is None:
+            end_date = dt.datetime.utcnow()
+        if start_date is None:
+            start_date = end_date - dt.timedelta(days=30)
+        else:
+            if start_date > end_date:
+                raise ValueError(
+                    f"Start date {start_date} is greater "
+                    f"than end date '{end_date}'")
+        query = _cc_statement_request(account_id, start_date, end_date)
         result = self.query(query)
         return result["transactions"]
