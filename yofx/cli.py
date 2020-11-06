@@ -68,7 +68,7 @@ def parse_tx_args(subparsers) -> None:
         type=int,
         help=(
             "number of days to download (default: %s)"
-            "" % DEFAULT_DOWNLOAD_DAYS,
+            "" % DEFAULT_DOWNLOAD_DAYS
         ),
     )
     tx_cmd.add_argument(
