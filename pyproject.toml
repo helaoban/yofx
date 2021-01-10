@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yofx"
-version = "0.1.1"
+version = "0.1.1-1"
 description = ""
 authors = ["Carlo Holl <carloholl@gmail.com>"]
 packages = [
